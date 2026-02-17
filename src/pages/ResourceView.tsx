@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
-import { useParams, Navigate, useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchResourceById, updateResource } from '@/services/learningPathService';
 import ResourceViewer from '@/components/ResourceViewer';
@@ -27,6 +27,18 @@ const ResourceView = () => {
     }
   }, [resource, resourceId]);
   
+  // Handle error state with side-effect in useEffect (not during render)
+  useEffect(() => {
+    if (error || (!isLoading && !resource)) {
+      toast({
+        title: "Error",
+        description: "The resource you're looking for doesn't exist or couldn't be loaded.",
+        variant: "destructive",
+      });
+      navigate(`/category/${categoryId}`, { replace: true });
+    }
+  }, [error, isLoading, resource, categoryId, navigate]);
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-[calc(100vh-100px)]">
@@ -36,13 +48,7 @@ const ResourceView = () => {
   }
   
   if (error || !resource) {
-    toast({
-      title: "Error",
-      description: "The resource you're looking for doesn't exist or couldn't be loaded.",
-      variant: "destructive",
-    });
-    
-    return <Navigate to={`/category/${categoryId}`} replace />;
+    return null; // Will redirect via useEffect above
   }
 
   const handleProgressUpdate = async (newProgress: number) => {

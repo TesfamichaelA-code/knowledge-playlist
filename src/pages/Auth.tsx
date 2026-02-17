@@ -39,7 +39,7 @@ const Auth = () => {
 
   // Redirect if already logged in
   if (user) {
-    return <Navigate to="/" />;
+    return <Navigate to="/dashboard" />;
   }
 
   return (

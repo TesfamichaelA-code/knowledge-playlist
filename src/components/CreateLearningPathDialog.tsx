@@ -88,6 +88,7 @@ const CreateLearningPathDialog = ({
         description: "Learning path created successfully",
       });
       queryClient.invalidateQueries({ queryKey: ["learningPaths"] });
+      queryClient.invalidateQueries({ queryKey: ["learningPathsWithStats"] });
       form.reset();
       onClose();
     },

@@ -1,18 +1,20 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Clock, CheckCircle, Circle } from 'lucide-react';
-import { Resource } from '@/utils/data';
+import { Clock, CheckCircle, Circle, Trash2 } from 'lucide-react';
+import { Resource } from '@/types';
 import { ProgressBar } from './ProgressBar';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 interface ResourceCardProps {
   resource: Resource;
   categoryId: string;
-  number?: number; // Add number as an optional prop
+  number?: number;
+  onDelete?: (resourceId: string) => void;
 }
 
-const ResourceCard: React.FC<ResourceCardProps> = ({ resource, categoryId, number }) => {
+const ResourceCard: React.FC<ResourceCardProps> = ({ resource, categoryId, number, onDelete }) => {
   const getResourceTypeIcon = () => {
     switch (resource.type) {
       case 'video':
@@ -78,9 +80,25 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, categoryId, numbe
               </span>
             </div>
             
-            <span className="text-xs font-medium text-muted-foreground">
-              {resource.progress}%
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-muted-foreground">
+                {resource.progress}%
+              </span>
+              {onDelete && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onDelete(resource.id);
+                  }}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              )}
+            </div>
           </div>
           
           <ProgressBar value={resource.progress} />

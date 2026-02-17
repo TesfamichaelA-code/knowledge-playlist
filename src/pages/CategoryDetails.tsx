@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { BookOpen, ChevronLeft, Loader2, Plus, Trash } from 'lucide-react';
@@ -11,7 +11,8 @@ import {
   fetchLearningPathById,
   fetchResourcesByPathId,
   deleteLearningPath,
-  createResource
+  createResource,
+  deleteResource
 } from '@/services/learningPathService';
 
 const CategoryDetails = () => {
@@ -19,32 +20,38 @@ const CategoryDetails = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [addResourceDialogOpen, setAddResourceDialogOpen] = useState(false);
-  
-  if (!categoryId) {
-    navigate('/');
-    return null;
-  }
 
   const { data: category, isLoading: isLoadingCategory } = useQuery({
     queryKey: ['learningPath', categoryId],
-    queryFn: () => fetchLearningPathById(categoryId),
+    queryFn: () => fetchLearningPathById(categoryId!),
+    enabled: !!categoryId,
   });
 
   const { data: resources, isLoading: isLoadingResources } = useQuery({
     queryKey: ['resources', categoryId],
-    queryFn: () => fetchResourcesByPathId(categoryId),
+    queryFn: () => fetchResourcesByPathId(categoryId!),
     enabled: !!categoryId,
   });
 
+  // Redirect if no categoryId (after hooks to respect rules of hooks)
+  useEffect(() => {
+    if (!categoryId) {
+      navigate('/dashboard');
+    }
+  }, [categoryId, navigate]);
+
   const handleDeleteCategory = async () => {
+    if (!categoryId) return;
     try {
       if (window.confirm('Are you sure you want to delete this learning path? This action cannot be undone.')) {
         await deleteLearningPath(categoryId);
+        queryClient.invalidateQueries({ queryKey: ['learningPathsWithStats'] });
+        queryClient.invalidateQueries({ queryKey: ['learningPaths'] });
         toast({
           title: 'Success',
           description: 'Learning path deleted successfully',
         });
-        navigate('/');
+        navigate('/dashboard');
       }
     } catch (error) {
       console.error('Error deleting learning path:', error);
@@ -56,7 +63,8 @@ const CategoryDetails = () => {
     }
   };
 
-  const handleAddResource = async (values: any) => {
+  const handleAddResource = async (values: { title: string; type: string; url: string; description?: string }) => {
+    if (!categoryId) return;
     const nextPosition = resources?.length ? resources.length : 0;
     
     await createResource({
@@ -64,14 +72,33 @@ const CategoryDetails = () => {
       title: values.title,
       type: values.type,
       url: values.url,
-      description: values.description,
+      description: values.description || null,
       position: nextPosition,
       progress: 0,
       completed: false,
-      duration: 30 // Default duration
+      duration: 30
     });
     
     queryClient.invalidateQueries({ queryKey: ['resources', categoryId] });
+  };
+
+  const handleDeleteResource = async (resourceId: string) => {
+    if (!window.confirm('Delete this resource?')) return;
+    try {
+      await deleteResource(resourceId);
+      queryClient.invalidateQueries({ queryKey: ['resources', categoryId] });
+      toast({
+        title: 'Resource deleted',
+        description: 'The resource has been removed.',
+      });
+    } catch (error) {
+      console.error('Error deleting resource:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete resource. Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
   if (isLoadingCategory || isLoadingResources) {
@@ -89,7 +116,7 @@ const CategoryDetails = () => {
         <Button 
           variant="outline" 
           className="mt-4"
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/dashboard')}
         >
           <ChevronLeft className="mr-2 h-4 w-4" />
           Back to Home
@@ -104,7 +131,7 @@ const CategoryDetails = () => {
         <Button 
           variant="outline" 
           size="sm" 
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/dashboard')}
         >
           <ChevronLeft className="mr-1 h-4 w-4" />
           Back
@@ -156,6 +183,7 @@ const CategoryDetails = () => {
               }}
               number={index + 1}
               categoryId={categoryId}
+              onDelete={handleDeleteResource}
             />
           ))}
         </div>

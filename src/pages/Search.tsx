@@ -4,15 +4,16 @@ import { useQuery } from '@tanstack/react-query';
 import { Search as SearchIcon, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import CategoryCard from '@/components/CategoryCard';
-import { fetchLearningPaths } from '@/services/learningPathService';
+import { fetchLearningPathsWithStats } from '@/services/learningPathService';
+import type { LearningPathWithStats } from '@/types';
 
 const Search = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<LearningPathWithStats[]>([]);
   
   const { data: learningPaths, isLoading } = useQuery({
-    queryKey: ['learningPaths'],
-    queryFn: fetchLearningPaths,
+    queryKey: ['learningPathsWithStats'],
+    queryFn: fetchLearningPathsWithStats,
   });
 
   useEffect(() => {
@@ -62,15 +63,7 @@ const Search = () => {
             {results.map((path) => (
               <CategoryCard 
                 key={path.id} 
-                category={{
-                  id: path.id,
-                  title: path.title,
-                  description: path.description || "",
-                  thumbnail: "", // Changed from image to thumbnail
-                  resources: [],
-                  totalResources: 0,
-                  completedResources: 0
-                }} 
+                category={path} 
               />
             ))}
           </div>

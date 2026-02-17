@@ -1,19 +1,28 @@
 
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import CategoryCard from '@/components/CategoryCard';
 import SearchBar from '@/components/SearchBar';
-import { Layers, Loader2 } from 'lucide-react';
-import { fetchLearningPaths } from '@/services/learningPathService';
+import { Layers, Loader2, Play } from 'lucide-react';
+import { fetchLearningPathsWithStats, fetchContinueLearningResource } from '@/services/learningPathService';
 import CreateLearningPathDialog from '@/components/CreateLearningPathDialog';
+import { ProgressBar } from '@/components/ProgressBar';
+import { Button } from '@/components/ui/button';
 
 const Index = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
   
   const { data: learningPaths, isLoading, error } = useQuery({
-    queryKey: ['learningPaths'],
-    queryFn: fetchLearningPaths,
+    queryKey: ['learningPathsWithStats'],
+    queryFn: fetchLearningPathsWithStats,
+  });
+
+  const { data: continueResource } = useQuery({
+    queryKey: ['continueLearning'],
+    queryFn: fetchContinueLearningResource,
   });
   
   const handleSearch = (query: string) => {
@@ -72,15 +81,7 @@ const Index = () => {
             {filteredPaths.map((path) => (
               <CategoryCard 
                 key={path.id} 
-                category={{
-                  id: path.id,
-                  title: path.title,
-                  description: path.description || "",
-                  thumbnail: "", // Changed from image to thumbnail
-                  resources: [],
-                  totalResources: 0, 
-                  completedResources: 0
-                }} 
+                category={path} 
               />
             ))}
           </div>
@@ -101,40 +102,47 @@ const Index = () => {
         )}
       </div>
       
-      <div className="space-y-6">
-        <h2 className="text-xl font-semibold">Continue Learning</h2>
-        
-        <div className="glass-card rounded-lg p-6 flex flex-col md:flex-row gap-6 items-center">
-          <div className="aspect-video md:w-1/3 rounded-lg overflow-hidden">
-            <img 
-              src="https://img.youtube.com/vi/Hf4MJH0jDb4/maxresdefault.jpg" 
-              alt="React Native Crash Course"
-              className="w-full h-full object-cover"
-            />
-          </div>
+      {continueResource && (
+        <div className="space-y-6">
+          <h2 className="text-xl font-semibold">Continue Learning</h2>
           
-          <div className="md:w-2/3 space-y-4">
-            <div>
-              <h3 className="text-lg font-semibold">React Native Crash Course</h3>
-              <p className="text-sm text-muted-foreground">Learn the basics of React Native in this crash course</p>
+          <div className="glass-card rounded-lg p-6 flex flex-col md:flex-row gap-6 items-center">
+            <div className="aspect-video md:w-1/3 rounded-lg overflow-hidden bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+              <Play className="h-12 w-12 text-primary/60" />
             </div>
             
-            <div className="space-y-2">
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-muted-foreground">30% completed</span>
-                <span className="text-muted-foreground">40 minutes left</span>
+            <div className="md:w-2/3 space-y-4">
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">{continueResource.pathTitle}</p>
+                <h3 className="text-lg font-semibold">{continueResource.title}</h3>
+                {continueResource.description && (
+                  <p className="text-sm text-muted-foreground">{continueResource.description}</p>
+                )}
               </div>
-              <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
-                <div className="h-full bg-primary w-[30%] rounded-full" />
+              
+              <div className="space-y-2">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground">{continueResource.progress || 0}% completed</span>
+                  {continueResource.duration && (
+                    <span className="text-muted-foreground">
+                      {Math.round((continueResource.duration * (100 - (continueResource.progress || 0))) / 100)} min left
+                    </span>
+                  )}
+                </div>
+                <ProgressBar value={continueResource.progress || 0} />
               </div>
+              
+              <Button
+                onClick={() => navigate(`/category/${continueResource.path_id}/resource/${continueResource.id}`)}
+                className="rounded-full"
+                size="sm"
+              >
+                Continue Learning
+              </Button>
             </div>
-            
-            <button className="px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm hover:bg-primary/90 transition-colors">
-              Continue Learning
-            </button>
           </div>
         </div>
-      </div>
+      )}
 
       <CreateLearningPathDialog 
         isOpen={isCreateDialogOpen}

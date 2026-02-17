@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Resource } from '@/utils/data';
+import { Resource } from '@/types';
 import { Check, Clock, ArrowLeft, ExternalLink, BookOpen, Trash } from 'lucide-react';
 import { ProgressBar } from './ProgressBar';
 import { Link, useNavigate } from 'react-router-dom';
@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import { deleteResource } from '@/services/learningPathService';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface ResourceViewerProps {
   resource: Resource;
@@ -57,6 +58,7 @@ const ResourceViewer: React.FC<ResourceViewerProps> = ({
   const [completed, setCompleted] = useState(resource.completed);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   // Sync component state with props when resource changes
   useEffect(() => {
@@ -96,6 +98,10 @@ const ResourceViewer: React.FC<ResourceViewerProps> = ({
     if (window.confirm('Are you sure you want to delete this resource? This action cannot be undone.')) {
       try {
         await deleteResource(resource.id);
+        // Invalidate caches so the category page shows fresh data
+        queryClient.invalidateQueries({ queryKey: ['resources', categoryId] });
+        queryClient.invalidateQueries({ queryKey: ['resource', resource.id] });
+        queryClient.invalidateQueries({ queryKey: ['learningPathsWithStats'] });
         toast({
           title: "Resource deleted",
           description: "The resource has been successfully deleted",
@@ -133,9 +139,9 @@ const ResourceViewer: React.FC<ResourceViewerProps> = ({
             <iframe
               src={embedUrl}
               title={resource.title}
-              className="w-full h-full"
+              className="w-full h-full border-0"
               allowFullScreen
-              frameBorder="0"
+              sandbox="allow-scripts allow-same-origin allow-popups allow-presentation"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             />
             {isFullscreen && (
@@ -160,8 +166,8 @@ const ResourceViewer: React.FC<ResourceViewerProps> = ({
             <iframe
               src={embedUrl}
               title={resource.title}
-              className="w-full h-full"
-              frameBorder="0"
+              className="w-full h-full border-0"
+              sandbox="allow-scripts allow-same-origin allow-popups allow-presentation"
             />
             {isFullscreen && (
               <Button
@@ -243,8 +249,7 @@ const ResourceViewer: React.FC<ResourceViewerProps> = ({
         </div>
       </div>
       
-      {!isFullscreen && renderResourceContent()}
-      {isFullscreen && renderResourceContent()}
+      {renderResourceContent()}
       
       {!isFullscreen && (
         <div className="glass-card rounded-lg p-6 space-y-4">

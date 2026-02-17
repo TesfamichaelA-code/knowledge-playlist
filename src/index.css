@@ -93,7 +93,7 @@
 }
 
 .content-container {
-  @apply flex-1 overflow-x-hidden;
+  @apply flex-1 overflow-x-hidden overflow-y-auto h-screen;
 }
 
 .page-container {

@@ -1,7 +1,6 @@
 
 import * as React from "react";
 import { useState } from "react";
-import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -105,13 +104,6 @@ export function AddResourceDialog({
           <DialogDescription>
             Add a learning resource to your path such as videos, articles, or documentation.
           </DialogDescription>
-          <Button
-            onClick={() => onOpenChange(false)}
-            variant="ghost"
-            className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100"
-          >
-            <X className="h-4 w-4" />
-          </Button>
         </DialogHeader>
 
         <Form {...form}>

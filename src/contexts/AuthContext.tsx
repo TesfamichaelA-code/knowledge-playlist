@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         throw error;
       }
       
-      navigate('/');
+      navigate('/dashboard');
     } catch (error: any) {
       toast({
         title: "Error signing in",
