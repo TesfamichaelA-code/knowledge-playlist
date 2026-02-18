@@ -35,7 +35,7 @@ const Sidebar = () => {
         {(!collapsed || isMobile) && (
           <Link to="/dashboard" className="flex items-center gap-2" onClick={handleNavClick}>
             <Layers className="h-6 w-6 text-primary" />
-            <span className="font-semibold text-lg tracking-tight">LearnPath</span>
+            <span className="font-semibold text-lg tracking-tight">Knowledge Playlist</span>
           </Link>
         )}
         {collapsed && !isMobile && <Layers className="h-6 w-6 mx-auto text-primary" />}

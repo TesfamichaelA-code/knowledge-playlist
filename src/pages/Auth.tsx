@@ -48,7 +48,7 @@ const Auth = () => {
         <div className="flex flex-col items-center text-center">
           <div className="flex items-center gap-2 mb-2">
             <Layers className="h-8 w-8 text-primary" />
-            <span className="font-bold text-2xl tracking-tight">LearnPath</span>
+            <span className="font-bold text-2xl tracking-tight">Knowledge Playlist</span>
           </div>
           <h2 className="text-2xl font-semibold tracking-tight">
             {isLogin ? 'Sign in to your account' : 'Create a new account'}

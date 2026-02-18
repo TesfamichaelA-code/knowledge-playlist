@@ -44,7 +44,7 @@ const Index = () => {
             <Layers className="h-3.5 w-3.5" />
             <span>Learning Paths</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold">Welcome to LearnPath</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">Welcome to Knowledge Playlist</h1>
           <p className="text-muted-foreground">Organize and track your learning journey</p>
         </div>
         

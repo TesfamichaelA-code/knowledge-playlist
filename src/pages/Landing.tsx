@@ -29,7 +29,7 @@ const Landing = () => {
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Layers className="h-6 w-6 text-primary" />
-            <span className="font-bold text-lg tracking-tight">LearnPath</span>
+            <span className="font-bold text-lg tracking-tight">Knowledge Playlist</span>
           </div>
           <div className="flex items-center gap-3">
             <Link to="/auth">
@@ -101,7 +101,7 @@ const Landing = () => {
                 <div className="w-3 h-3 rounded-full bg-green-500/70" />
               </div>
               <div className="flex-1 text-center">
-                <span className="text-xs text-muted-foreground font-mono">learnpath — dashboard</span>
+                <span className="text-xs text-muted-foreground font-mono">knowledge-playlist — dashboard</span>
               </div>
             </div>
             <div className="p-6 sm:p-8 space-y-6">
@@ -268,7 +268,7 @@ const Landing = () => {
           </div>
           <blockquote className="text-xl sm:text-2xl font-medium italic leading-relaxed text-foreground/90">
             "The best way to learn is to build your own curriculum from the resources
-            that resonate with you. LearnPath makes that effortless."
+            that resonate with you. Knowledge Playlist makes that effortless."
           </blockquote>
         </div>
       </section>
@@ -297,10 +297,10 @@ const Landing = () => {
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Layers className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">LearnPath</span>
+            <span className="text-sm font-medium">Knowledge Playlist</span>
           </div>
           <p className="text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} LearnPath. Built for learners, by learners.
+            &copy; {new Date().getFullYear()} Knowledge Playlist. Built for learners, by learners.
           </p>
         </div>
       </footer>
